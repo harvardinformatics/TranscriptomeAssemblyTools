@@ -5,8 +5,17 @@ import argparse
 import re
 from itertools import izip,izip_longest
 
+def seqsmatch(overreplist,read):
+    flag=False
+    if overreplist!=[]:
+        for seq in overreplist:
+            if seq in read:
+                flag=True
+                break
+    return flag
+            
 def get_input_streams(r1file,r2file):
-    if sys.argv[1][-2:]=='gz':
+    if  r1file[-2:]=='gz':
         r1handle=gzip.open(r1file,'rb')
         r2handle=gzip.open(r2file,'rb')
     else:
@@ -36,16 +45,18 @@ if __name__=="__main__":
 
     leftseqs=ParseFastqcLog(opts.l_fastqc)
     rightseqs=ParseFastqcLog(opts.r_fastqc)
-
+   
     r1_out=open('rmoverrep_'+basename(opts.leftreads).replace('.gz',''),'w')
     r2_out=open('rmoverrep_'+basename(opts.rightreads).replace('.gz',''),'w')
     
     r1_stream,r2_stream=get_input_streams(opts.leftreads,opts.rightreads)
+        
+    counter=0
+    failcounter=0
 
     with r1_stream as f1, r2_stream as f2:
         R1=FastqIterate(f1)
         R2=FastqIterate(f2)
-        counter=0
         for entry in R1:
             counter+=1
             if counter%100000==0:
@@ -53,18 +64,20 @@ if __name__=="__main__":
         
             head1,seq1,placeholder1,qual1=[i.strip() for i in entry]
             head2,seq2,placeholder2,qual2=[j.strip() for j in R2.next()]
- 
-            if leftseqs!=[]:
-                for seq in leftseqs:
-                    if seq in seq1:
-                        break
-            if rightseqs!=[]:
-                for seq in rightseqs:
-                    if seq in seq2:
-                        break
+            
+            flagleft,flagright=seqsmatch(leftseqs,seq1),seqsmatch(rightseqs,seq2)
+            
+            if True not in (flagleft,flagright):
+                r1_out.write('%s\n' % '\n'.join([head1,seq1,'+',qual1]))
+                r2_out.write('%s\n' % '\n'.join([head2,seq2,'+',qual2]))
             else:
-                r1_out.write('\n'.join(head1,seq1,'+',qual1))
-                r1_out.write('\n'.join(head2,seq2,'+',qual2))
-       
+                failcounter+=1
+
+
+        print 'total # of reads evaluated = %s' % counter
+        print 'number of reads retained = %s' % (counter-failcounter)
+        print 'number of PE reads filtered = %s' % failcounter
+
+
 r1_out.close()
 r2_out.close()
