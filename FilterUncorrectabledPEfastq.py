@@ -1,19 +1,32 @@
 """
 author: adam h freedman
-data: 03/2016
-this script takes as an input Rcorrector error corrected reads
-in fastq format and removes any reads that Rcorrect indentifes
-as containing an error, but can't be corrected, typically
-low complexity sequences. for these, the header contains 'unfixable'
+afreedman405@gmail.com
+data: Fri Aug 26 10:55:18 EDT 2016
 
-upcated on 2017-05-10 to take either gzipped or unzipped fastq files.
-gzipped files must end in 'gz' for the script to work properly!
+This script takes as an input Rcorrector error corrected Illumina paired-reads
+in fastq format and:
+
+1. Removes any reads that Rcorrector indentifes as containing an error,
+but can't be corrected, typically low complexity sequences. For these,
+the header contains 'unfixable'.
+
+2. Strips the ' cor' from headers of reads that Rcorrector fixed, to avoid
+issues created by certain header formats for downstream tools.
+
+3. Write a log with counts of (a) read pairs that were removed because one end
+was unfixable, (b) corrected left and right reads, (c) total number of
+read pairs containing at least one corrected read.
+
+Currently, this script only handles paired-end data, and handle either unzipped
+or gzipped files on the fly, so long as the gzipped files end with 'gz'.
 
 """
 
 import sys        
 import gzip
 from itertools import izip,izip_longest
+import argparse
+from os.path import basename
 
 def get_input_streams(r1file,r2file):
     if sys.argv[1][-2:]=='gz':
@@ -32,14 +45,25 @@ def grouper(iterable, n, fillvalue=None):
     args = [iter(iterable)] * n
     return izip_longest(fillvalue=fillvalue, *args)  
     
-r1out=open("unfixrm"+sys.argv[1].replace('.gz',''),'w')
-r2out=open("unfixrm"+sys.argv[2].replace('.gz','') ,'w')
+
+if __name__=="__main__": 
+    parser = argparse.ArgumentParser(description="options for filtering and logging rCorrector fastq outputs")
+    parser.add_argument('-1','--left_reads',dest='leftreads',type=str,help='R1 fastq file')
+    parser.add_argument('-2','--right_reads',dest='rightreads',type=str,help='R2 fastq file')
+    parser.add_argument('-o','--out_prefix',dest='outprefix',type=str,help="prefix for filtered fastq output")
+    opts = parser.parse_args()
+
+
+
+r1out=open(opts.outprefix+'_'+basename(opts.leftreads).replace('.gz',''),'w')
+r2out=open(opts.outprefix+'_'+basename(opts.rightreads).replace('.gz','') ,'w')
+
 r1_cor_count=0
 r2_cor_count=0
 pair_cor_count=0
 unfix_count=0   
 
-r1_stream,r2_stream=get_input_streams(sys.argv[1],sys.argv[2])
+r1_stream,r2_stream=get_input_streams(opts.leftreads,opts.rightreads)
 
 with r1_stream as f1, r2_stream as f2:
         R1=grouper(f1,4)
