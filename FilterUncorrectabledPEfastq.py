@@ -1,6 +1,6 @@
 """
 author: adam h freedman
-afreedman405@gmail.com
+afreedman405 at gmail.com
 data: Fri Aug 26 10:55:18 EDT 2016
 
 This script takes as an input Rcorrector error corrected Illumina paired-reads
