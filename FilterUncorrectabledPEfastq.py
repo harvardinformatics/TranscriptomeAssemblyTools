@@ -29,7 +29,7 @@ import argparse
 from os.path import basename
 
 def get_input_streams(r1file,r2file):
-    if sys.argv[1][-2:]=='gz':
+    if r1file[-2:]=='gz':
         r1handle=gzip.open(r1file,'rb')
         r2handle=gzip.open(r2file,'rb')
     else:
