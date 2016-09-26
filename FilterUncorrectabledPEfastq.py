@@ -53,19 +53,17 @@ if __name__=="__main__":
     parser.add_argument('-o','--out_prefix',dest='outprefix',type=str,help="prefix for filtered fastq output")
     opts = parser.parse_args()
 
+    r1out=open(opts.outprefix+'_'+basename(opts.leftreads).replace('.gz',''),'w')
+    r2out=open(opts.outprefix+'_'+basename(opts.rightreads).replace('.gz','') ,'w')
 
+    r1_cor_count=0
+    r2_cor_count=0
+    pair_cor_count=0
+    unfix_count=0   
 
-r1out=open(opts.outprefix+'_'+basename(opts.leftreads).replace('.gz',''),'w')
-r2out=open(opts.outprefix+'_'+basename(opts.rightreads).replace('.gz','') ,'w')
+    r1_stream,r2_stream=get_input_streams(opts.leftreads,opts.rightreads)
 
-r1_cor_count=0
-r2_cor_count=0
-pair_cor_count=0
-unfix_count=0   
-
-r1_stream,r2_stream=get_input_streams(opts.leftreads,opts.rightreads)
-
-with r1_stream as f1, r2_stream as f2:
+    with r1_stream as f1, r2_stream as f2:
         R1=grouper(f1,4)
         R2=grouper(f2,4)
         counter=0
@@ -91,8 +89,8 @@ with r1_stream as f1, r2_stream as f2:
                 r1out.write('%s\n' % '\n'.join([head1,seq1,placeholder1,qual1]))
                 r2out.write('%s\n' % '\n'.join([head2,seq2,placeholder2,qual2]))
 
-unfix_log=open('rmunfixable.log','w')
-unfix_log.write('total PE reads:%s\nremoved PE reads:%s\nretained PE reads:%s\nR1 corrected:%s\nR2 corrected:%s\npairs corrected:%s\n' % (counter,unfix_count,counter-unfix_count,r1_cor_count,r2_cor_count,pair_cor_count))
+    unfix_log=open('rmunfixable.log','w')
+    unfix_log.write('total PE reads:%s\nremoved PE reads:%s\nretained PE reads:%s\nR1 corrected:%s\nR2 corrected:%s\npairs corrected:%s\n' % (counter,unfix_count,counter-unfix_count,r1_cor_count,r2_cor_count,pair_cor_count))
             
-r1out.close()
-r2out.close() 
+    r1out.close()
+    r2out.close() 
