@@ -1,3 +1,4 @@
+from os.path import basename,dirname
 import argparse
 from subprocess import Popen,PIPE
 import glob
@@ -13,7 +14,7 @@ def sortbam(unsorted_bam):
     coordinate sorts bam file
     """
     print('coordinate sorting %s\n' % unsorted_bam)
-    cmd='samtools sort %s> sorted_%s' % (unsorted_bam,unsorted_bam)
+    cmd='samtools sort %s> %s/sorted_%s' % (unsorted_bam,dirname(unsorted_bam),basename(unsorted_bam))
     samsort=Popen(cmd,shell=True,stderr=PIPE,stdout=PIPE)
     samsort_stdout,samsort_stderr=samsort.communicate()
     if samsort.returncode==0:
@@ -23,7 +24,7 @@ def sortbam(unsorted_bam):
 
 
 def extractbamheader(bamin):
-    cmd='samtools view -H %s > header.sam' % bamin
+    cmd='samtools view -H %s > %s/header%s.sam' % (bamin,dirname(bamin),basename(bamin)[:-4])
     headgrab=Popen(cmd,shell=True,stderr=PIPE,stdout=PIPE)
     headout,headerr=headgrab.communicate()
     if headgrab.returncode==0:
@@ -35,7 +36,7 @@ def extractbamheader(bamin):
 
 
 def addheadertosam(samin):
-    concatcmd='cat header.sam namesort_%s > wheader_%s' % (samin,samin)
+    concatcmd='cat %s/header%s.sam %s/namesort_%s > %s/wheader_%s' % (dirname(samin),basename(samin)[:-4],dirname(samin),basename(samin),dirname(samin),basename(samin))
     doconcat=Popen(concatcmd,shell=True,stderr=PIPE,stdout=PIPE)
     concatout,concaterr=doconcat.communicate()
     if doconcat.returncode==0:
@@ -46,7 +47,7 @@ def addheadertosam(samin):
     return concatpass
 
 def sam2bam(samin):
-    bamcmd='samtools view -Sbh %s > %s.bam' % (samin,samin[:-4])
+    bamcmd='samtools view -Sbh %s > %s/%s.bam' % (samin,dirname(samin),basename(samin)[:-4])
     makebam=Popen(bamcmd,shell=True,stederr=PIPE,stdout=PIPE)
     bamout,bamerr=makebam.communicate()
     if makebam.returncode==0:
@@ -60,9 +61,9 @@ def sam2bam(samin):
 def namesortsam(samin):
     """
     takes filtered sam file, name sorts it,
-    and writes it, with header, as a bam file
+    and writes it, with header, as a sam file
     """
-    sortcmd='samtools sort -n -o namesort_%s %s' % (samin,samin)
+    sortcmd='samtools sort -n -o %s/namesort_%s %s' % (dirname(samin),basename(samin),samin)
     dosort=Popen(sortcmd,shell=True,stderr=PIPE,stdout=PIPE)
     sortout,sorterr=dosort.communicate()
     if dosort.returncode==0:
@@ -75,7 +76,7 @@ def namesortsam(samin):
  
 def indexbam(sorted_bam):
     print('indexing %s\n' % sorted_bam) 
-    cmd='samtools index %s' % sorted_bam
+    cmd='samtools index %s/%s' % (dirname(sorted_bam),sorted_bam)
     samindex=Popen(cmd,shell=True,stderr=PIPE,stdout=PIPE)
     samindex_stdout,samindex_stderr=samindex.communicate()
     if samindex.returncode==0:
@@ -97,7 +98,7 @@ def write_mate_sams(bamin,hexval,mate):
     bam file for a pass-filter contig in a
      mate-specific fashion
     """
-    cmd='samtools view -h -f %s %s > %s_%s.sam' % (hexval,bamin,bamin[:-4],mate)
+    cmd='samtools view -h -f %s %s > %s/%s_%s.sam' % (hexval,bamin,dirname(bamin),basename(bamin)[:-4],mate)
     getreads=Popen(cmd,shell=True,stderr=PIPE,stdout=PIPE)
     readsout,readserr=getreads.communicate()
     if getreads.returncode==0:
