@@ -145,7 +145,7 @@ if __name__=="__main__":
         sortedbam=opts.bamin
     else:
         bamsorter=sortbam(opts.bamin)
-        sortedbam='sorted_%s' % opts.bamin
+        sortedbam='sorted_%s' % basename(opts.bamin)
     
     ### verify or make bam file index is present
     if glob.glob('%s.bai' % sortedbam)==[]:
@@ -172,7 +172,7 @@ if __name__=="__main__":
         
         else:
             print 'writing unique %s reads to fastq' % mate
-            sam2fastq('namesort_%s_%s.sam' % (sortedbam[:-4],mate),good_contigs)
+            sam2fastq('%s/namesort_%s_%s.sam' % (dirname(sortedbam),basename(sortedbam)[:-4],mate),good_contigs)
 
 
 
