@@ -51,6 +51,7 @@ if __name__=="__main__":
     parser.add_argument('-1','--left_reads',dest='leftreads',type=str,help='R1 fastq file')
     parser.add_argument('-2','--right_reads',dest='rightreads',type=str,help='R2 fastq file')
     parser.add_argument('-o','--out_prefix',dest='outprefix',type=str,help="prefix for filtered fastq output")
+    parser.add_argument('-s','--sample_id',dest='id',type=str,help='sample name to write to log file')
     opts = parser.parse_args()
 
     r1out=open(opts.outprefix+'_'+basename(opts.leftreads).replace('.gz',''),'w')
@@ -59,7 +60,9 @@ if __name__=="__main__":
     r1_cor_count=0
     r2_cor_count=0
     pair_cor_count=0
-    unfix_count=0   
+    unfix_r1_count=0
+    unfix_r2_count=0
+    unfix_both_count=0   
 
     r1_stream,r2_stream=get_input_streams(opts.leftreads,opts.rightreads)
 
@@ -75,8 +78,12 @@ if __name__=="__main__":
             head1,seq1,placeholder1,qual1=[i.strip() for i in entry]
             head2,seq2,placeholder2,qual2=[j.strip() for j in R2.next()]
             
-            if 'unfixable' in head1 or 'unfixable' in head2:
-                unfix_count+=1
+            if 'unfixable' in head1 and 'unfixable' not in head2:
+                unfix_r1_count+=1
+            elif 'unfixable' in head2 and 'unfixable' not in head1:
+                unfix_r2_count+=1
+            elif 'unfixable' in head1 and 'unfixable' in head2:
+                unfix_both_count+=1
             else:
                 if 'cor' in head1:
                     r1_cor_count+=1
@@ -85,15 +92,17 @@ if __name__=="__main__":
                 if 'cor' in head1 or 'cor' in head2:
                     pair_cor_count+=1
                 
-                head1=head1.split('l:')[0][:-1] # keeps all before the low kmer count statistic and removes the trailing whitespace character
-                head2=head2.split('l:')[0][:-1] 
-                #head1=head1.replace(' cor','')
-                #head2=head2.replace(' cor','')
+                head1=head1.split('l:')[0][:-1] 
+                head2=head2.split('l:')[0][:-1]
                 r1out.write('%s\n' % '\n'.join([head1,seq1,placeholder1,qual1]))
                 r2out.write('%s\n' % '\n'.join([head2,seq2,placeholder2,qual2]))
+    
+    total_unfixable = unfix_r1_count+unfix_r2_count+unfix_both_count
+    total_retained = counter - total_unfixable
 
-    unfix_log=open('rmunfixable.log','w')
-    unfix_log.write('total PE reads:%s\nremoved PE reads:%s\nretained PE reads:%s\nR1 corrected:%s\nR2 corrected:%s\npairs corrected:%s\n' % (counter,unfix_count,counter-unfix_count,r1_cor_count,r2_cor_count,pair_cor_count))
+    unfix_log=open('rmunfixable_%s.log' % opts.id,'w')
+    unfix_log.write('total PE reads:%s\nremoved PE reads:%s\nretained PE reads:%s\nR1 corrected:%s\nR2 corrected:%s\npairs corrected:%s\nR1 unfixable:%s\nR2 unfixable:%s\nboth reads unfixable:%s\n' % (counter,total_unfixable,retained,r1_cor_count,r2_cor_count,pair_cor_count,unfix_r1_count,unfix_r2_count,unfix_both_count))
             
     r1out.close()
     r2out.close() 
+    unfix_log.close()
