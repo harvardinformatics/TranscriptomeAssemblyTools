@@ -101,7 +101,7 @@ if __name__=="__main__":
     total_retained = counter - total_unfixable
 
     unfix_log=open('rmunfixable_%s.log' % opts.id,'w')
-    unfix_log.write('total PE reads:%s\nremoved PE reads:%s\nretained PE reads:%s\nR1 corrected:%s\nR2 corrected:%s\npairs corrected:%s\nR1 unfixable:%s\nR2 unfixable:%s\nboth reads unfixable:%s\n' % (counter,total_unfixable,retained,r1_cor_count,r2_cor_count,pair_cor_count,unfix_r1_count,unfix_r2_count,unfix_both_count))
+    unfix_log.write('total PE reads:%s\nremoved PE reads:%s\nretained PE reads:%s\nR1 corrected:%s\nR2 corrected:%s\npairs corrected:%s\nR1 unfixable:%s\nR2 unfixable:%s\nboth reads unfixable:%s\n' % (counter,total_unfixable,total_retained,r1_cor_count,r2_cor_count,pair_cor_count,unfix_r1_count,unfix_r2_count,unfix_both_count))
             
     r1out.close()
     r2out.close() 
