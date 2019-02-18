@@ -26,20 +26,11 @@ if __name__=="__main__":
     parser = argparse.ArgumentParser(description="options for filtering and logging rCorrector fastq outputs")
     parser.add_argument('-1','--left_reads',dest='leftreads',type=str,help='R1 fastq file')
     parser.add_argument('-2','--right_reads',dest='rightreads',type=str,help='R2 fastq file')
-    parser.add_argument('-o','--out_prefix',dest='outprefix',type=str,help="prefix for filtered fastq output")
     opts = parser.parse_args()
 
-    r1out=open(opts.outprefix+'_'+basename(opts.leftreads).replace('.gz',''),'w')
-    r2out=open(opts.outprefix+'_'+basename(opts.rightreads).replace('.gz','') ,'w')
-    
-    
-    r1_cor_count=0
-    r2_cor_count=0
-    pair_cor_count=0
-    unfix_count=0   
-
+    r1out=open('sraheaderfixed_%s' % basename(opts.leftreads).replace('.gz',''),'w')
+    r2out=open('sraheaderfixed_%s' % basename(opts.rightreads).replace('.gz',''),'w') 
     r1_stream,r2_stream=get_input_streams(opts.leftreads,opts.rightreads)
-
     with r1_stream as f1, r2_stream as f2:
         R1=grouper(f1,4)
         R2=grouper(f2,4)
@@ -56,5 +47,5 @@ if __name__=="__main__":
             r1out.write('%s\n' % '\n'.join([head1,seq1,placeholder1,qual1]))
             r2out.write('%s\n' % '\n'.join([head2,seq2,placeholder2,qual2]))
             
-r1out.close()
-r2out.close() 
+    r1out.close()
+    r2out.close() 
