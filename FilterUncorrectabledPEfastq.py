@@ -50,12 +50,11 @@ if __name__=="__main__":
     parser = argparse.ArgumentParser(description="options for filtering and logging rCorrector fastq outputs")
     parser.add_argument('-1','--left_reads',dest='leftreads',type=str,help='R1 fastq file')
     parser.add_argument('-2','--right_reads',dest='rightreads',type=str,help='R2 fastq file')
-    parser.add_argument('-o','--out_prefix',dest='outprefix',type=str,help="prefix for filtered fastq output")
     parser.add_argument('-s','--sample_id',dest='id',type=str,help='sample name to write to log file')
     opts = parser.parse_args()
 
-    r1out=open(opts.outprefix+'_'+basename(opts.leftreads).replace('.gz',''),'w')
-    r2out=open(opts.outprefix+'_'+basename(opts.rightreads).replace('.gz','') ,'w')
+    r1out=open('unfixrm_%s' % basename(opts.leftreads).replace('.gz',''),'w')
+    r2out=open('unfixrm_%s' % basename(opts.rightreads).replace('.gz','') ,'w')
 
     r1_cor_count=0
     r2_cor_count=0
