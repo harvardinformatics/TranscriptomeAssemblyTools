@@ -44,6 +44,8 @@ if __name__=="__main__":
             head2,seq2,placeholder2,qual2=[j.strip() for j in R2.next()]
             head1=head1.split()[0]+'/1'
             head2=head2.split()[0]+'/2'
+            placeholder1 = '+'
+            placeholder2 = '+'
             r1out.write('%s\n' % '\n'.join([head1,seq1,placeholder1,qual1]))
             r2out.write('%s\n' % '\n'.join([head2,seq2,placeholder2,qual2]))
             
