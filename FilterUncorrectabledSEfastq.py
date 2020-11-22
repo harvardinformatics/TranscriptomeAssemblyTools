@@ -46,7 +46,7 @@ if __name__=="__main__":
     parser.add_argument('-s','--sample_id', dest='id',type=str,help='sample name to write to log file')
     opts = parser.parse_args()
 
-    out=open('unfixrm_%s' % basename(opts.reads).replace('.gz',''),'w')
+    out=open('%s' % basename(opts.reads).replace('.gz',''),'w')
 
     cor_count=0
     unfix_count=0 
