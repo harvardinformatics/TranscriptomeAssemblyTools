@@ -53,8 +53,8 @@ if __name__=="__main__":
     parser.add_argument('-s','--sample_id',dest='id',type=str,help='sample name to write to log file')
     opts = parser.parse_args()
 
-    r1out=open('unfixrm_%s' % basename(opts.leftreads).replace('.gz',''),'w')
-    r2out=open('unfixrm_%s' % basename(opts.rightreads).replace('.gz','') ,'w')
+    r1out=open('%s' % basename(opts.leftreads).replace('.gz',''),'w')
+    r2out=open('%s' % basename(opts.rightreads).replace('.gz','') ,'w')
 
     r1_cor_count=0
     r2_cor_count=0
@@ -72,7 +72,7 @@ if __name__=="__main__":
         for entry in R1:
             counter+=1
             if counter%100000==0:
-                print "%s reads processed" % counter
+                print("%s reads processed" % counter)
         
             head1,seq1,placeholder1,qual1=[i.strip() for i in entry]
             head2,seq2,placeholder2,qual2=[j.strip() for j in R2.next()]
