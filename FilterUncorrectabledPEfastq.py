@@ -95,6 +95,7 @@ if __name__=="__main__":
                     r1_cor_count+=1
                 if 'cor' in head2:
                     r2_cor_count+=1
+                #if 'cor' in head1 or 'cor' in head2:
                 if 'cor' in head1 or 'cor' in head2:
                     pair_cor_count+=1
                 
