@@ -26,7 +26,8 @@ import sys
 import gzip
 from itertools import izip,izip_longest
 import argparse
-from os.path import basename
+#from os.path import basename
+import os.path
 
 def get_input_streams(r1file,r2file):
     if r1file[-2:]=='gz':
@@ -53,9 +54,15 @@ if __name__=="__main__":
     parser.add_argument('-s','--sample_id',dest='id',type=str,help='sample name to write to log file')
     opts = parser.parse_args()
 
-    r1out=open('unfixrm_%s' % basename(opts.leftreads).replace('.gz',''),'w')
-    r2out=open('unfixrm_%s' % basename(opts.rightreads).replace('.gz','') ,'w')
-
+    #r1out=open('unfixrm_%s' % basename(opts.leftreads).replace('.gz',''),'w')
+    #r2out=open('unfixrm_%s' % basename(opts.rightreads).replace('.gz','') ,'w')
+    # r1out=open('unfixrm_%s' % basename(opts.leftreads).replace('.gz',''),'w')
+    # r2out=open('unfixrm_%s' % basename(opts.rightreads).replace('.gz','') ,'w')
+    output_dir = os.path.dirname(opts.leftreads)
+    r1out = open(os.path.join(output_path, "unfixrm_{}".format(
+        os.path.basename(opts.leftreads).replace('.gz', ''))), 'w')
+    r2out = open(os.path.join(output_path, "unfixrm_{}".format(
+        os.path.basename(opts.rightreads).replace('.gz', ''))), 'w')
     r1_cor_count=0
     r2_cor_count=0
     pair_cor_count=0
@@ -88,18 +95,21 @@ if __name__=="__main__":
                     r1_cor_count+=1
                 if 'cor' in head2:
                     r2_cor_count+=1
+                #if 'cor' in head1 or 'cor' in head2:
                 if 'cor' in head1 or 'cor' in head2:
                     pair_cor_count+=1
                 
-                head1=head1.split('l:')[0][:-1] 
-                head2=head2.split('l:')[0][:-1]
+                #head1=head1.split('l:')[0][:-1] 
+                #head2=head2.split('l:')[0][:-1]
                 r1out.write('%s\n' % '\n'.join([head1,seq1,placeholder1,qual1]))
                 r2out.write('%s\n' % '\n'.join([head2,seq2,placeholder2,qual2]))
     
     total_unfixable = unfix_r1_count+unfix_r2_count+unfix_both_count
     total_retained = counter - total_unfixable
 
-    unfix_log=open('rmunfixable_%s.log' % opts.id,'w')
+    #unfix_log=open('rmunfixable_%s.log' % opts.id,'w')
+    unfix_log = open(os.path.join(
+        output_path, "rmunfixable_{}.log".format(opts.id)), 'w')
     unfix_log.write('total PE reads:%s\nremoved PE reads:%s\nretained PE reads:%s\nR1 corrected:%s\nR2 corrected:%s\npairs corrected:%s\nR1 unfixable:%s\nR2 unfixable:%s\nboth reads unfixable:%s\n' % (counter,total_unfixable,total_retained,r1_cor_count,r2_cor_count,pair_cor_count,unfix_r1_count,unfix_r2_count,unfix_both_count))
             
     r1out.close()
