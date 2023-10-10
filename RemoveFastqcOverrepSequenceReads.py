@@ -41,8 +41,10 @@ if __name__=="__main__":
     parser.add_argument('-2','--right_reads',dest='rightreads',type=str,help='R2 fastq file')
     parser.add_argument('-fql','--fastqc_left',dest='l_fastqc',type=str,help='fastqc text file for R1')
     parser.add_argument('-fqr','--fastqc_right',dest='r_fastqc',type=str,help='fastqc text file for R2')
+    parser.add_argument('-o','--output-log-prefix',dest='logprefix',type=str,help='prefix for logfile summarizing filtering')
     opts = parser.parse_args()
 
+    logout = open('%s_rmoverrep.log' % opts.logprefix,'w')
     leftseqs=ParseFastqcLog(opts.l_fastqc)
     rightseqs=ParseFastqcLog(opts.r_fastqc)
    
@@ -73,11 +75,9 @@ if __name__=="__main__":
             else:
                 failcounter+=1
 
-
-        print 'total # of reads evaluated = %s' % counter
-        print 'number of reads retained = %s' % (counter-failcounter)
-        print 'number of PE reads filtered = %s' % failcounter
-
+        logout.write('n_reads_eval\tn_reads_retained\tn_pe_reads_filtered\n')
+        logout.write('%s\t%s\t%s\n' % (counter,counter-failcounter,failcounter))
+        logout.close()
 
 r1_out.close()
 r2_out.close()
