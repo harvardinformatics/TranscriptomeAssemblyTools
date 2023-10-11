@@ -11,3 +11,18 @@ A collection of scripts for pre-processing fastq files prior to *de novo* transc
 
 From our years of experience troubleshooting and evaluating *de novo* transcriptome assemblies, we have identified a number of statistical issues regarding the robustness of downstream analyses based upon them. A summary of these issues can be found at [Freedman et al. 2020, *Molecular Ecology Resources*](https://onlinelibrary.wiley.com/doi/abs/10.1111/1755-0998.13156). Given these issues and the rapidly decreasing cost of generating a genome assembly, we suggest that during the study design phase of your project, you consider the feasibility of assembling and annotating a genome before choosing to generate a *de novo* transcriptome assembly.
 
+## Workflow steps
+To the extent possible, to improve reproducibility (not to mention ease of implementation!), we run analyses from within conda environments. Below, we explain how to execute particular steps assuming that a separate conda enviornment is created for each step
+
+### 1. Running fastqc
+We can create a conda environment for *fastqc* as follows:
+```bash
+conda create -n fastqc -c bioconda fastqc
+```
+Then, we can run *fastqc*, one fastq file at a time, with [fastqc.sh](https://github.com/harvardinformatics/TranscriptomeAssemblyTools/blob/master/job_scripts/fastqc.sh)
+```bash
+sbatch fastqc.sh <name of fastq file>
+```
+Note, if one supplies more threads to *fastqc*, with the *-t* switch, one can supply multiple fastq files at once. When choosing whether or not to run *fastqc* in multi-threaded mode, remember that the program only allocates 1 thread per file, i.e. there is no benefit to specifying more than one thread when only one file is being quality-checked. 
+
+
