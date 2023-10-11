@@ -12,7 +12,7 @@ A collection of scripts for pre-processing fastq files prior to *de novo* transc
 From our years of experience troubleshooting and evaluating *de novo* transcriptome assemblies, we have identified a number of statistical issues regarding the robustness of downstream analyses based upon them. A summary of these issues can be found at [Freedman et al. 2020, *Molecular Ecology Resources*](https://onlinelibrary.wiley.com/doi/abs/10.1111/1755-0998.13156). Given these issues and the rapidly decreasing cost of generating a genome assembly, we suggest that during the study design phase of your project, you consider the feasibility of assembling and annotating a genome before choosing to generate a *de novo* transcriptome assembly.
 
 ## Workflow steps
-To the extent possible, to improve reproducibility (not to mention ease of implementation!), we run analyses from within conda environments. Below, we explain how to execute particular steps assuming that a separate conda enviornment is created for each step
+To the extent possible, to improve reproducibility (not to mention ease of implementation!), we run analyses from within conda environments. Below, we explain how to execute particular steps assuming that a separate conda enviornment is created for each step, with job scripts designed to be run on the SLURM job scheduler. These can easily be modified to work with other schedulers such as SGE and LSF.
 
 ### 1. Running fastqc
 We can create a conda environment for *fastqc* as follows:
