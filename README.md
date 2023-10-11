@@ -15,7 +15,9 @@ From our years of experience troubleshooting and evaluating *de novo* transcript
 To the extent possible, to improve reproducibility (not to mention ease of implementation!), we run analyses from within conda environments. Below, we explain how to execute particular steps assuming that a separate conda enviornment is created for each step, with job scripts designed to be run on the SLURM job scheduler. These can easily be modified to work with other schedulers such as SGE and LSF.
 
 ### 1. Running fastqc
-We can create a conda environment for *fastqc* as follows:
+*Fastqc* generated a bunch of quality metrics such as quality-by-cycle, frequency by cycle, of adapter sequence, and overrepresentation of sequences. This information can provide some initial information about potential issues with sequencing library quality, and may highlight the importance of particular downstream filtering steps.
+
+We can create a conda environment for *fastqc* as follows
 ```bash
 conda create -n fastqc -c bioconda fastqc
 ```
@@ -25,4 +27,5 @@ sbatch fastqc.sh <name of fastq file>
 ```
 Note, if one supplies more threads to *fastqc*, with the *-t* switch, one can supply multiple fastq files at once. When choosing whether or not to run *fastqc* in multi-threaded mode, remember that the program only allocates 1 thread per file, i.e. there is no benefit to specifying more than one thread when only one file is being quality-checked. 
 
-
+### 2. Kmer-based error corrections with *rCorrector*
+For a given RNA-seq experiment, kmers observed in reads very rarely are likely to be those containing (at least one) sequencing error. Such errors can negatively impact the quality of a *de novo* transcsriptome assembly, and so ideally we either corrector the errors or remove erroneous reads that are computationally "uncorrectable". We can do this with *rCorrector*, a bioinformatics tool that first builds a kmer library for a set of reads, then identifies rare kmers, attempts to find a more frequent kmer that doesn't differ by it too much, correct the read to the more frequent kmer. If there isn't a detectable correction for a flagged rare kmer, *rCorrector* flags it as unfixable.
