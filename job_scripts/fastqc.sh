@@ -17,6 +17,8 @@ it will simply require adding: module load python.
 """
 
 source activate fastqc
+infile=$1 # $1 represent the first (and in this case only) command line argument supplied to the script
+echo "infile is $infile"
 
-fastqc --outdir `pwd`/fastqc $1
+fastqc --outdir `pwd`/fastqc $infile
 
