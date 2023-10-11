@@ -1,8 +1,11 @@
 # TranscriptomeAssemblyTools
-A collection of scripts for processing fastq files in ways to improve de novo transcriptome assemblies, and for evaluating those assemblies.
+A collection of scripts for pre-processing fastq files prior to *de novo* transcriptome assembly, as well as slurm scripts for running what we view as a reasonable best practice workflow, the steps of which are:
 
-## FilterUncorrectablePEfastq.py
-Takes a paired-end Illumina fastq file generated from an RNA-seq library, and that has been error corrected with [rCorrector](https://github.com/mourisl/Rcorrector), see [Song and Florea 2015, Gigascience](https://gigascience.biomedcentral.com/articles/10.1186/s13742-015-0089-y),and removes reads with errors but that are unfixable, and strips 'cor' flags from reads that were corrected.
+1. run *fastqc* on raw fastq reads to identify potential issues with Illumina sequencing libraries such as retained adapter, over-represented (often low complexity) sequences, greater than expected decrease in base quality with read cycle
+1. perform kmer-based read corrections with with [rCorrector](https://github.com/mourisl/Rcorrector), see [Song and Florea 2015, Gigascience](https://gigascience.biomedcentral.com/articles/10.1186/s13742-015-0089-y)
+1. remove read pairs where at least one read has been flagged by *rcorrector* as containing an erroneous kmer, and where it was not possible to computationally correct the errors
+1. remove read pairs where at least read contains an over-represented sequence
+1. perform light quality trimming with *trimgalore*
+1. optionally, to map the remaining reads to the SILVA rRNA database, then filtering read pairs where at least one read aligns to an rRNA sequence
+1. assembly reads with Trinity
 
-## RemoveFastqcOverrepSequenceReads.py
-Parses the fastqc output files to retrieve over-represented sequences, and uses these to remove read pairs where either read has a sequence match to an over-represented sequence.
