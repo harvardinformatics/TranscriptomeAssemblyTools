@@ -21,11 +21,34 @@ We can create a conda environment for *fastqc* as follows
 ```bash
 conda create -n fastqc -c bioconda fastqc
 ```
-Then, we can run *fastqc*, one fastq file at a time, with [fastqc.sh](https://github.com/harvardinformatics/TranscriptomeAssemblyTools/blob/master/job_scripts/fastqc.sh)
+Then, we can run *fastqc*. Assuming we run each file as a separate job, the command line looks like this:
+```bash
+fastqc --outdir `pwd`/fastqc <name of your fastq file>
+```
+where *--outdir* simply indicates where you want to store the output. In this case, we are storing it in a directory called fastqc nested inside the current working directory.
+
+This command can be submitted as a SLURM job with [fastqc.sh](https://github.com/harvardinformatics/TranscriptomeAssemblyTools/blob/master/job_scripts/fastqc.sh)
 ```bash
 sbatch fastqc.sh <name of fastq file>
 ```
+
 Note, if one supplies more threads to *fastqc*, with the *-t* switch, one can supply multiple fastq files at once. When choosing whether or not to run *fastqc* in multi-threaded mode, remember that the program only allocates 1 thread per file, i.e. there is no benefit to specifying more than one thread when only one file is being quality-checked. 
 
 ### 2. Kmer-based error corrections with *rCorrector*
-For a given RNA-seq experiment, kmers observed in reads very rarely are likely to be those containing (at least one) sequencing error. Such errors can negatively impact the quality of a *de novo* transcsriptome assembly, and so ideally we either corrector the errors or remove erroneous reads that are computationally "uncorrectable". We can do this with *rCorrector*, a bioinformatics tool that first builds a kmer library for a set of reads, then identifies rare kmers, attempts to find a more frequent kmer that doesn't differ by it too much, correct the read to the more frequent kmer. If there isn't a detectable correction for a flagged rare kmer, *rCorrector* flags it as unfixable.
+For a given RNA-seq experiment, kmers observed in reads very rarely are likely to be those containing (at least one) sequencing error. Such errors can negatively impact the quality of a *de novo* transcsriptome assembly, and so ideally we either corrector the errors or remove erroneous reads that are computationally "uncorrectable". We can do this with *rCorrector*, a bioinformatics tool that first builds a kmer library for a set of reads, then identifies rare kmers, attempts to find a more frequent kmer that doesn't differ by it too much, correct the read to the more frequent kmer. If there isn't a detectable correction for a flagged rare kmer, *rCorrector* flags it as unfixable. *rCorrector* takes as input all of the paired-end reads that are to be used to generate the assembly.
+
+We can create a conda environment as follows:
+```bash
+conda create -n rcorrector -c bioconda rcorrector
+```
+
+Then, we can run the following command line:
+```bash
+run_rcorrector.pl -t 16 -1 <comma-separated list of R1 files>  -2 <comma-separated list of R2 files>
+```
+where "-t" is a command line switch to specify how many threads to use in the analysis.
+
+This command can be submitted as a SLURM job with [rcorrector.sh](https://github.com/harvardinformatics/TranscriptomeAssemblyTools/blob/master/job_scripts/rcorector.sh)
+```bash
+sbatch rcorrector.sh <comma-separated list of R1 files> <comma-separated list of R2 files>
+```
