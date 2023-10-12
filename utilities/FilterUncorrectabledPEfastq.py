@@ -32,6 +32,7 @@ except ImportError:
 
 import argparse
 import os.path
+from os import system
 
 def get_input_streams(r1file,r2file):
     if r1file[-2:]=='gz':
@@ -63,6 +64,8 @@ if __name__=="__main__":
         os.path.basename(opts.leftreads).replace('.gz', ''))), 'w')
     r2out = open(os.path.join(output_dir, "unfixrm_{}".format(
         os.path.basename(opts.rightreads).replace('.gz', ''))), 'w')
+
+
     r1_cor_count=0
     r2_cor_count=0
     pair_cor_count=0
@@ -81,8 +84,8 @@ if __name__=="__main__":
             if counter%100000==0:
                 print("%s reads processed" % counter)
         
-            head1,seq1,placeholder1,qual1=[i.strip() for i in entry]
-            head2,seq2,placeholder2,qual2=[j.strip() for j in next(R2)]
+            head1,seq1,placeholder1,qual1=[i.decode('ASCII').strip() for i in entry]
+            head2,seq2,placeholder2,qual2=[j.decode('ASCII').strip() for j in next(R2)]
             
             if 'unfixable' in head1 and 'unfixable' not in head2:
                 unfix_r1_count+=1
@@ -98,8 +101,8 @@ if __name__=="__main__":
                 if 'cor' in head1 or 'cor' in head2:
                     pair_cor_count+=1
                 
-                r1out.write('%s\n' % '\n'.join([head1,seq1,placeholder1,qual1]))
-                r2out.write('%s\n' % '\n'.join([head2,seq2,placeholder2,qual2]))
+                r1out.write('%s\n' % '\n'.join([head1.replace(' cor',''),seq1,placeholder1,qual1]))
+                r2out.write('%s\n' % '\n'.join([head2.replace(' cor',''),seq2,placeholder2,qual2]))
     
     total_unfixable = unfix_r1_count+unfix_r2_count+unfix_both_count
     total_retained = counter - total_unfixable
@@ -111,3 +114,8 @@ if __name__=="__main__":
     r1out.close()
     r2out.close() 
     unfix_log.close()
+    outfiles = [os.path.join(output_dir, "unfixrm_{}".format(os.path.basename(opts.leftreads).replace('.gz', ''))),
+                os.path.join(output_dir, "unfixrm_{}".format(os.path.basename(opts.rightreads).replace('.gz', '')))]
+    for outfile in outfiles:
+        print("gzipping %s" % outfile)
+        os.system("gzip %s" % outfile)
