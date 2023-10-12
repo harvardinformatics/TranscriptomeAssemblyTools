@@ -1,7 +1,9 @@
+#!/usr/bin/python
+
 """
 author: adam h freedman
 afreedman405 at gmail.com
-data: Fri Aug 26 10:55:18 EDT 2016
+data: Thursday Oct 12 EDT 2023
 
 This script takes as an input Rcorrector error corrected Illumina paired-reads
 in fastq format and:
