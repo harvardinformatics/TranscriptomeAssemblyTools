@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 """
 author: adam h freedman
 afreedman405 at gmail.com
