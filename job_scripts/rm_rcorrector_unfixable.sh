@@ -12,7 +12,7 @@
 r1=$1 # rCorrector corrected left (R1)fastq file
 r2=$2 # rCorrector corrected right (R2) fastq file
 sample_name=$3 # sample name used for outfiles prefix
-echo "input read pair files are: $r1 and $r2""
+echo "input read pair files are: $r1 and $r2"
 
-FilterUncorrectabledPEfastq.py -1 $r1 -2 $r2 -s $sample $sample_name
+FilterUncorrectabledPEfastq.py -1 $r1 -2 $r2 -s $sample_name
 
