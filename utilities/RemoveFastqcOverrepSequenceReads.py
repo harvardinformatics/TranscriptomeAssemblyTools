@@ -33,6 +33,8 @@ def ParseFastqcLog(fastqclog):
     with open(fastqclog) as fp:
         for result in re.findall('Overrepresented sequences(.*?)END_MODULE', fp.read(), re.S):
             seqs=([i.split('\t')[0] for i in result.split('\n')[2:-1]])
+            if result == []:
+                seqs = [] 
     return seqs     
 
 if __name__=="__main__": 
@@ -46,7 +48,11 @@ if __name__=="__main__":
 
     logout = open('%s_rmoverrep.log' % opts.logprefix,'w')
     leftseqs=ParseFastqcLog(opts.l_fastqc)
+    if leftseqs = []:
+        print("no overrepresented sequences in R1")
     rightseqs=ParseFastqcLog(opts.r_fastqc)
+    if rightseqs == []:
+        print("no overrepresented sequences in R2")    
    
     r1_out=open('rmoverrep_'+basename(opts.leftreads).replace('.gz',''),'w')
     r2_out=open('rmoverrep_'+basename(opts.rightreads).replace('.gz',''),'w')
