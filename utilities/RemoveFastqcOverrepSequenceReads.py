@@ -3,7 +3,11 @@ import gzip
 from os.path import basename
 import argparse
 import re
-from itertools import izip,izip_longest
+try:
+    from itertools import izip_longest
+except ImportError: 
+    from itertools import zip_longest as izip_longest
+
 
 def seqsmatch(overreplist,read):
     flag=False
@@ -48,7 +52,7 @@ if __name__=="__main__":
 
     logout = open('%s_rmoverrep.log' % opts.logprefix,'w')
     leftseqs=ParseFastqcLog(opts.l_fastqc)
-    if leftseqs = []:
+    if leftseqs == []:
         print("no overrepresented sequences in R1")
     rightseqs=ParseFastqcLog(opts.r_fastqc)
     if rightseqs == []:
@@ -68,10 +72,13 @@ if __name__=="__main__":
         for entry in R1:
             counter+=1
             if counter%100000==0:
-                print "%s reads processed" % counter
+                print("%s reads processed" % counter)
         
-            head1,seq1,placeholder1,qual1=[i.strip() for i in entry]
-            head2,seq2,placeholder2,qual2=[j.strip() for j in R2.next()]
+            
+            head1,seq1,placeholder1,qual1=[i.decode('ASCII').strip() for i in entry]
+            head2,seq2,placeholder2,qual2=[j.decode('ASCII').strip() for j in next(R2)]
+            #head1,seq1,placeholder1,qual1=[i.strip() for i in entry]
+            #head2,seq2,placeholder2,qual2=[j.strip() for j in R2.next()]
             
             flagleft,flagright=seqsmatch(leftseqs,seq1),seqsmatch(rightseqs,seq2)
             
