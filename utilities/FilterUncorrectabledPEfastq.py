@@ -21,6 +21,7 @@ Currently, this script only handles paired-end data, and handle either unzipped
 or gzipped files on the fly, so long as the gzipped files end with 'gz'.
 
 """
+#!/usr/bin/python3
 import argparse
 import sys        
 import gzip
